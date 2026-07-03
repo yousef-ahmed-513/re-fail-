@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#0e0f10" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Twittey Waiter Menu</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="assets/icons/icon-192.png" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand" id="homeBrand" role="button" tabindex="0" aria-label="Home">
+      <div class="brand-mark">☕</div>
+      <div><div class="brand-name">Twittey</div><div class="brand-sub">CAFFE &amp; SWEET</div></div>
+    </div>
+    <div class="header-actions">
+      <button class="lang-btn" id="langBtn" type="button">العربية</button>
+      <button class="install-btn hidden" id="installBtn" type="button">Install</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="staff-strip">
+      <label><span data-i18n="waiter">Waiter</span><input id="waiterInput" autocomplete="off" placeholder="Name" /></label>
+      <label><span data-i18n="table">Table</span><input id="tableInput" inputmode="numeric" placeholder="No." /></label>
+      <div class="clock" id="clock"></div>
+    </section>
+
+    <section id="homeView" class="view active">
+      <div class="welcome">
+        <p class="eyebrow">TWITTEY • CAFFE &amp; SWEET</p>
+        <h1 data-i18n="chooseCategory">Choose a category</h1>
+        <p data-i18n="tapCategory">Tap a photo to open the products.</p>
+      </div>
+      <div class="search-wrap">
+        <span class="search-icon">⌕</span>
+        <input id="searchInput" type="search" data-placeholder="search" placeholder="Search products or categories" />
+        <button id="clearSearch" class="clear-search hidden" aria-label="Clear search">×</button>
+      </div>
+      <div id="categoryGrid" class="category-grid"></div>
+      <div id="noResults" class="empty-state hidden"><span>⌕</span><p data-i18n="noResults">No matching products found.</p></div>
+    </section>
+
+    <section id="categoryView" class="view">
+      <button id="backBtn" class="back-btn" type="button">‹ <span data-i18n="back">Back</span></button>
+      <div id="categoryHero" class="category-hero"></div>
+      <div id="heroMeta" class="hero-meta"></div>
+      <div id="productGrid" class="product-grid"></div>
+    </section>
+  </main>
+
+  <button id="cartFab" class="cart-fab" type="button" aria-label="Open order">
+    <span class="cart-symbol">🧾</span><span id="cartFabLabel">Order</span><span id="cartCount" class="cart-count">0</span>
+  </button>
+
+  <div id="drawerBackdrop" class="drawer-backdrop"></div>
+  <aside id="cartDrawer" class="cart-drawer" aria-label="Current order">
+    <div class="drawer-head">
+      <div><p class="eyebrow">TWITTEY</p><h2 data-i18n="currentOrder">Current order</h2></div>
+      <button id="closeCart" class="icon-btn" type="button">×</button>
+    </div>
+    <div id="orderMeta" class="order-meta"></div>
+    <div id="cartItems" class="cart-items"></div>
+    <div id="cartEmpty" class="cart-empty"><div>☕</div><p data-i18n="emptyOrder">No items added yet.</p></div>
+    <label class="order-note"><span data-i18n="orderNote">Order note</span><textarea id="orderNote" rows="2" data-placeholder="notePlaceholder" placeholder="Example: takeaway, no sugar..."></textarea></label>
+    <div class="totals"><span data-i18n="total">Total</span><strong id="cartTotal">0.000 OMR</strong></div>
+    <div class="drawer-actions">
+      <button id="copyOrder" class="secondary-btn" type="button" data-i18n="copy">Copy</button>
+      <button id="printOrder" class="secondary-btn" type="button" data-i18n="print">Print</button>
+      <button id="clearOrder" class="danger-btn" type="button" data-i18n="clear">Clear</button>
+    </div>
+  </aside>
+
+  <div id="productModal" class="modal-backdrop">
+    <div class="product-modal" role="dialog" aria-modal="true">
+      <button id="closeModal" class="modal-close" type="button">×</button>
+      <div id="modalThumb" class="modal-thumb"></div>
+      <p id="modalCategory" class="eyebrow"></p>
+      <h2 id="modalName"></h2>
+      <div class="modal-price" id="modalPrice"></div>
+      <div class="quantity-picker"><button id="qtyMinus" type="button">−</button><strong id="modalQty">1</strong><button id="qtyPlus" type="button">+</button></div>
+      <div id="extrasBox" class="extras-box">
+        <h3 data-i18n="chooseExtras">Choose extras</h3>
+        <div id="extrasList"></div>
+      </div>
+      <label class="item-note"><span data-i18n="itemNote">Item note</span><textarea id="itemNote" rows="2" data-placeholder="itemNotePlaceholder" placeholder="Example: less ice, no sugar..."></textarea></label>
+      <button id="addToOrder" class="primary-btn" type="button"><span data-i18n="addOrder">Add to order</span><strong id="modalTotal"></strong></button>
+    </div>
+  </div>
+
+  <section id="printArea" class="print-area"></section>
+  <div id="toast" class="toast"></div>
+  <script>window.MENU_DATA = [{"id": "signature", "name": "Signature Drinks", "nameAr": "المشروبات المميزة", "image": "signature.jpg", "icon": "★", "items": [["Spanish Latte", "سبانيش لاتيه", 1.3], ["Pistachio Latte", "لاتيه فستق", 1.6], ["Dirty Coffee", "ديرتي كوفي", 1.6], ["White Mocha", "وايت موكا", 1.4], ["Caramel Macchiato", "كراميل ماكياتو", 1.2], ["Nitro Cold Brew", "نايترو كولد برو", 1.2], ["Hibiscus Refresher", "منعش الكركديه", 1.2]]}, {"id": "hot-coffee", "name": "Hot Coffee", "nameAr": "قهوة ساخنة", "image": "hot-coffee.jpg", "icon": "☕", "items": [["Espresso", "إسبريسو", 0.8], ["Americano", "أمريكانو", 1.0], ["Cappuccino", "كابتشينو", 1.2], ["Latte", "لاتيه", 1.2], ["Flat White", "فلات وايت", 1.2], ["Mocha", "موكا", 1.3], ["Hot Chocolate", "هوت شوكليت", 1.3]]}, {"id": "iced-coffee", "name": "Iced Coffee", "nameAr": "قهوة باردة", "image": "iced-coffee.jpg", "icon": "❄", "items": [["Iced Latte", "آيس لاتيه", 1.3], ["Iced Spanish Latte", "آيس سبانيش لاتيه", 1.2], ["Iced Americano", "آيس أمريكانو", 1.0], ["Iced Mocha", "آيس موكا", 1.4], ["Cold Brew", "كولد برو", 1.5]]}, {"id": "frappuccino", "name": "Frappuccino", "nameAr": "فرابتشينو", "image": "frappuccino.jpg", "icon": "✦", "items": [["Caramel Frappuccino", "كراميل فرابتشينو", 1.5], ["Mocha Frappuccino", "موكا فرابتشينو", 1.5], ["White Mocha Frappuccino", "وايت موكا فرابتشينو", 1.5], ["Hazelnut Frappuccino", "بندق فرابتشينو", 1.5], ["Pistachio Frappuccino", "فستق فرابتشينو", 1.5], ["Cookies & Cream Frappuccino", "كوكيز آند كريم فرابتشينو", 1.5]]}, {"id": "milkshake", "name": "Milk Shake", "nameAr": "ميلك شيك", "image": "milkshake.jpg", "icon": "△", "items": [["Oreo Milk Shake", "أوريو ميلك شيك", 1.4], ["Chocolate Milk Shake", "شوكولاتة ميلك شيك", 1.3], ["Vanilla Milk Shake", "فانيلا ميلك شيك", 1.3], ["Strawberry Milk Shake", "فراولة ميلك شيك", 1.4], ["Lotus Milk Shake", "لوتس ميلك شيك", 1.4]]}, {"id": "matcha", "name": "Matcha Days", "nameAr": "ماتشا", "image": "matcha.jpg", "icon": "✿", "items": [["Matcha Latte", "ماتشا لاتيه", 1.5], ["Iced Matcha Latte", "آيس ماتشا لاتيه", 1.5], ["Matcha Coconut Latte", "ماتشا جوز الهند", 1.8], ["Strawberry Matcha", "ماتشا فراولة", 1.8]]}, {"id": "slush", "name": "Slush (Smoothie)", "nameAr": "سلاش وسموذي", "image": "slush.jpg", "icon": "☂", "items": [["Mango Slush", "سلاش مانجو", 1.3], ["Strawberry Slush", "سلاش فراولة", 1.3], ["Watermelon Slush", "سلاش بطيخ", 1.0], ["Blueberry Slush", "سلاش بلوبيري", 1.3], ["Passion Fruit Slush", "سلاش باشن فروت", 1.3], ["Peach Slush", "سلاش خوخ", 1.3], ["Mixed Berry Slush", "سلاش توت مشكل", 1.3]]}, {"id": "signature-iced", "name": "Signature Iced", "nameAr": "مشروب بارد مميز", "image": "signature-iced.jpg", "icon": "❅", "items": [["Hibiscus Iced Tea (Karkadeh)", "آيس تي كركديه", 1.2]]}, {"id": "mojito", "name": "Mojito & Refreshers", "nameAr": "موهيتو ومنعشات", "image": "mojito.jpg", "icon": "☘", "items": [["Blue Mojito", "موهيتو أزرق", 1.4], ["Passion Fruit Mojito", "موهيتو باشن فروت", 1.4], ["Green Apple Mojito", "موهيتو تفاح أخضر", 1.4], ["Strawberry Mojito", "موهيتو فراولة", 1.4], ["Lemon Mint", "ليمون نعناع", 1.2], ["Peach Ice Tea", "آيس تي خوخ", 1.4]]}, {"id": "fresh-juice", "name": "Fresh Juice", "nameAr": "عصائر طازجة", "image": "fresh-juice.jpg", "icon": "☞", "items": [["Strawberry Juice", "عصير فراولة", 1.2], ["Mango Juice", "عصير مانجو", 1.2], ["Pineapple Juice", "عصير أناناس", 1.2], ["Orange Juice", "عصير برتقال", 1.0]]}, {"id": "dessert", "name": "Dessert", "nameAr": "حلويات", "image": "dessert.jpg", "icon": "♡", "items": [["Tiramisu Cup", "كوب تيراميسو", 2.0], ["San Sebastian", "سان سباستيان", 2.0], ["Brownies", "براونيز", 1.6], ["Cookies", "كوكيز", 0.8], ["Chocolate Cake", "كيك شوكولاتة", 1.5], ["Cheesecake (Berry)", "تشيز كيك توت", 1.6]]}, {"id": "extras", "name": "Extras", "nameAr": "إضافات", "image": "extras.jpg", "icon": "+", "items": [["Extra Shot", "شوت إضافي", 0.3], ["Flavored Syrup", "سيرب نكهة", 0.3], ["Oat Milk", "حليب شوفان", 0.3], ["Almond Milk", "حليب لوز", 0.3], ["Whipped Cream", "كريمة مخفوقة", 0.3], ["Extra Sauce", "صوص إضافي", 0.3]]}];</script>
+  <script src="app.js"></script>
+</body>
+</html>
