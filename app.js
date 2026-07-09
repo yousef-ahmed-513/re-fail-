@@ -31,7 +31,7 @@ function renderCategories(query=''){
   const filtered=menu.filter(c=> !q || [c.name,c.nameAr,...c.items.flatMap(i=>[i[0],i[1]])].join(' ').toLowerCase().includes(q));
   filtered.forEach(c=>{
     const btn=document.createElement('button');btn.className='category-card';
-    btn.innerHTML=`<div class="cat-banner"><img src="./${c.image}" alt="${nameOf(c)}" loading="lazy"></div><div class="cat-label"><span>${c.icon} ${nameOf(c)}</span><em>${c.items.length} ${t('products')}</em></div>`;
+    btn.innerHTML=`<div class="cat-banner"><img src="assets/heroes/${c.image}" alt="${nameOf(c)}" loading="lazy"></div><div class="cat-label"><span>${c.icon} ${nameOf(c)}</span><em>${c.items.length} ${t('products')}</em></div>`;
     btn.onclick=()=>openCategory(c.id); grid.appendChild(btn);
   });
   $('#noResults').classList.toggle('hidden',filtered.length>0);
@@ -39,16 +39,16 @@ function renderCategories(query=''){
 function openCategory(id){state.activeCategory=id;renderCategory(id);$('#homeView').classList.remove('active');$('#categoryView').classList.add('active');window.scrollTo({top:0,behavior:'smooth'});}
 function renderCategory(id){
   const c=menu.find(x=>x.id===id);if(!c)return;
-  $('#categoryHero').style.backgroundImage=`url('./${c.image}')`;$('#heroMeta').textContent=`${c.icon} ${nameOf(c)} · ${c.items.length} ${t('products')}`;
+  $('#categoryHero').style.backgroundImage=`url('assets/heroes/${c.image}')`;$('#heroMeta').textContent=`${c.icon} ${nameOf(c)} · ${c.items.length} ${t('products')}`;
   const grid=$('#productGrid');grid.innerHTML='';c.items.forEach((i,idx)=>{
-    const card=document.createElement('article');card.className='product-card';card.innerHTML=`<div class="product-thumb"><span>${c.icon}</span></div><div class="product-info"><h3>${state.lang==='ar'?i[1]:i[0]}</h3><p>${state.lang==='ar'?i[0]:i[1]}</p><p class="price">${money(i[2])}</p></div><button class="add-btn" aria-label="Add">+</button>`;
+    const card=document.createElement('article');card.className='product-card';const thumb=i[3]?`<img src="assets/products/${i[3]}" alt="${i[0]}" loading="lazy" onerror="this.parentElement.innerHTML='<span>${c.icon}</span>'">`:`<span>${c.icon}</span>`;card.innerHTML=`<div class="product-thumb">${thumb}</div><div class="product-info"><h3>${state.lang==='ar'?i[1]:i[0]}</h3><p>${state.lang==='ar'?i[0]:i[1]}</p><p class="price">${money(i[2])}</p></div><button class="add-btn" aria-label="Add">+</button>`;
     card.querySelector('.add-btn').onclick=(e)=>{e.stopPropagation();openProductModal(c.id,idx)};card.onclick=()=>openProductModal(c.id,idx);grid.appendChild(card);
   });
 }
 function showHome(){state.activeCategory=null;$('#categoryView').classList.remove('active');$('#homeView').classList.add('active');window.scrollTo({top:0,behavior:'smooth'});}
 function openProductModal(catId,itemIndex){
   const c=menu.find(x=>x.id===catId), i=c.items[itemIndex];state.modal={cat:c,item:i,itemIndex,qty:1,extras:[]};
-  $('#modalThumb').style.backgroundImage=`url('./${c.image}')`;$('#modalCategory').textContent=nameOf(c);$('#modalName').textContent=state.lang==='ar'?i[1]:i[0];$('#modalPrice').textContent=money(i[2]);$('#modalQty').textContent='1';$('#itemNote').value='';
+  $('#modalThumb').style.backgroundImage=i[3]?`url('assets/products/${i[3]}')`:`url('assets/heroes/${c.image}')`;$('#modalCategory').textContent=nameOf(c);$('#modalName').textContent=state.lang==='ar'?i[1]:i[0];$('#modalPrice').textContent=money(i[2]);$('#modalQty').textContent='1';$('#itemNote').value='';
   $('#extrasBox').classList.toggle('hidden',catId==='extras');renderExtras();updateModalTotal();$('#productModal').classList.add('open');
 }
 function renderExtras(){const box=$('#extrasList');box.innerHTML='';extrasCategory.items.forEach((e,idx)=>{const row=document.createElement('div');row.className='extra-choice';row.innerHTML=`<label><input type="checkbox" data-idx="${idx}"><span>${state.lang==='ar'?e[1]:e[0]}</span></label><strong>+${money(e[2])}</strong>`;row.querySelector('input').onchange=ev=>{const n=Number(ev.target.dataset.idx);if(ev.target.checked)state.modal.extras.push(n);else state.modal.extras=state.modal.extras.filter(x=>x!==n);updateModalTotal()};box.appendChild(row)});}
