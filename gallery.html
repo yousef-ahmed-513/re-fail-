@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Twittey — معرض الصور</title>
+<style>
+:root{--black:#0e0f10;--yellow:#ffd200;--blue:#6fd2dd;--paper:#f3f5f3;--muted:#9aa0a4;--line:#23262a}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,"Segoe UI",Tahoma,Arial,sans-serif;background:var(--black);color:#fff}
+header{position:sticky;top:0;z-index:10;background:#0e0f10;border-bottom:3px solid var(--yellow);padding:16px 20px;display:flex;align-items:center;gap:12px}
+.mark{width:46px;height:46px;display:grid;place-items:center;border-radius:14px;background:var(--yellow);font-size:24px}
+.brand-name{font-size:26px;font-weight:900;font-style:italic;color:var(--yellow);line-height:1}
+.brand-sub{font-size:9px;font-weight:800;letter-spacing:3px;color:var(--blue);margin-top:4px}
+.wrap{max-width:1200px;margin:0 auto;padding:24px 18px 60px}
+.count{color:var(--muted);font-size:14px;margin:6px 0 26px}
+.cat-title{display:flex;align-items:center;gap:10px;font-size:22px;font-weight:900;margin:36px 0 16px;color:var(--yellow)}
+.cat-title span.em{font-style:normal;font-weight:800;font-size:13px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}
+.card{background:#17191b;border:1px solid var(--line);border-radius:18px;overflow:hidden;cursor:pointer;transition:transform .2s,box-shadow .2s}
+.card:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(0,0,0,.5)}
+.card .imgbox{aspect-ratio:1/1;background:#000}
+.card img{width:100%;height:100%;object-fit:cover;display:block}
+.card .info{padding:12px 14px}
+.card h3{margin:0 0 4px;font-size:16px}
+.card p{margin:0;color:var(--muted);font-size:13px}
+.card .price{margin-top:6px;color:var(--yellow);font-weight:900;font-size:14px}
+/* lightbox */
+.lb{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.94);display:none;align-items:center;justify-content:center;padding:20px;flex-direction:column}
+.lb.open{display:flex}
+.lb img{max-width:min(92vw,900px);max-height:80vh;border-radius:16px;object-fit:contain}
+.lb .cap{margin-top:16px;text-align:center}
+.lb .cap h2{margin:0 0 4px;font-size:24px;color:#fff}
+.lb .cap p{margin:0;color:var(--muted)}
+.lb .cap .price{color:var(--yellow);font-weight:900;font-size:20px;margin-top:6px}
+.lb .close{position:absolute;top:18px;left:18px;width:46px;height:46px;border:0;border-radius:50%;background:#fff;color:#000;font-size:26px;cursor:pointer}
+.lb .nav{position:absolute;top:50%;transform:translateY(-50%);width:54px;height:54px;border:0;border-radius:50%;background:rgba(255,255,255,.15);color:#fff;font-size:30px;cursor:pointer}
+.lb .prev{right:16px}.lb .next{left:16px}
+@media(max-width:520px){.grid{grid-template-columns:repeat(2,1fr);gap:11px}.card h3{font-size:14px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="mark">&#9749;</div>
+  <div><div class="brand-name">Twittey</div><div class="brand-sub">CAFFE &amp; SWEET</div></div>
+</header>
+<div class="wrap">
+  <div class="count" id="count"></div>
+  <div id="cats"></div>
+</div>
+
+<div class="lb" id="lb">
+  <button class="close" id="lbClose">&times;</button>
+  <button class="nav prev" id="lbPrev">&#8250;</button>
+  <button class="nav next" id="lbNext">&#8249;</button>
+  <img id="lbImg" src="" alt=""/>
+  <div class="cap"><h2 id="lbName"></h2><p id="lbNameAr"></p><div class="price" id="lbPrice"></div></div>
+</div>
+
+<script>
+const DATA = [{"name": "Signature Drinks", "nameAr": "المشروبات المميزة", "icon": "★", "items": [{"name": "Spanish Latte", "nameAr": "سبانيش لاتيه", "price": 1.3, "img": "spanish-latte.jpg"}, {"name": "Pistachio Latte", "nameAr": "لاتيه فستق", "price": 1.6, "img": "pistachio-latte.jpg"}, {"name": "Dirty Coffee", "nameAr": "ديرتي كوفي", "price": 1.6, "img": "dirty-coffee.jpg"}, {"name": "White Mocha", "nameAr": "وايت موكا", "price": 1.4, "img": "white-mocha.jpg"}, {"name": "Caramel Macchiato", "nameAr": "كراميل ماكياتو", "price": 1.2, "img": "caramel-macchiato.jpg"}, {"name": "Nitro Cold Brew", "nameAr": "نايترو كولد برو", "price": 1.2, "img": "nitro-cold-brew.jpg"}, {"name": "Hibiscus Refresher", "nameAr": "منعش الكركديه", "price": 1.2, "img": "hibiscus-refresher.jpg"}]}, {"name": "Hot Coffee", "nameAr": "قهوة ساخنة", "icon": "☕", "items": [{"name": "Espresso", "nameAr": "إسبريسو", "price": 0.8, "img": "espresso.jpg"}, {"name": "Americano", "nameAr": "أمريكانو", "price": 1.0, "img": "americano.jpg"}, {"name": "Cappuccino", "nameAr": "كابتشينو", "price": 1.2, "img": "cappuccino.jpg"}, {"name": "Latte", "nameAr": "لاتيه", "price": 1.2, "img": "latte.jpg"}, {"name": "Flat White", "nameAr": "فلات وايت", "price": 1.2, "img": "flat-white.jpg"}, {"name": "Mocha", "nameAr": "موكا", "price": 1.3, "img": "mocha.jpg"}, {"name": "Hot Chocolate", "nameAr": "هوت شوكليت", "price": 1.3, "img": "hot-chocolate.jpg"}]}, {"name": "Iced Coffee", "nameAr": "قهوة باردة", "icon": "❄", "items": [{"name": "Iced Latte", "nameAr": "آيس لاتيه", "price": 1.3, "img": "iced-latte.jpg"}, {"name": "Iced Spanish Latte", "nameAr": "آيس سبانيش لاتيه", "price": 1.2, "img": "iced-spanish-latte.jpg"}, {"name": "Iced Americano", "nameAr": "آيس أمريكانو", "price": 1.0, "img": "iced-americano.jpg"}, {"name": "Iced Mocha", "nameAr": "آيس موكا", "price": 1.4, "img": "iced-mocha.jpg"}, {"name": "Cold Brew", "nameAr": "كولد برو", "price": 1.5, "img": "cold-brew.jpg"}]}, {"name": "Frappuccino", "nameAr": "فرابتشينو", "icon": "✦", "items": [{"name": "Caramel Frappuccino", "nameAr": "كراميل فرابتشينو", "price": 1.5, "img": "caramel-frappuccino.jpg"}, {"name": "Mocha Frappuccino", "nameAr": "موكا فرابتشينو", "price": 1.5, "img": "mocha-frappuccino.jpg"}, {"name": "White Mocha Frappuccino", "nameAr": "وايت موكا فرابتشينو", "price": 1.5, "img": "white-mocha-frappuccino.jpg"}, {"name": "Hazelnut Frappuccino", "nameAr": "بندق فرابتشينو", "price": 1.5, "img": "hazelnut-frappuccino.jpg"}, {"name": "Pistachio Frappuccino", "nameAr": "فستق فرابتشينو", "price": 1.5, "img": "pistachio-frappuccino.jpg"}, {"name": "Cookies & Cream Frappuccino", "nameAr": "كوكيز آند كريم فرابتشينو", "price": 1.5, "img": "cookies-cream-frappuccino.jpg"}]}, {"name": "Milk Shake", "nameAr": "ميلك شيك", "icon": "△", "items": [{"name": "Oreo Milk Shake", "nameAr": "أوريو ميلك شيك", "price": 1.4, "img": "oreo-milkshake.jpg"}, {"name": "Chocolate Milk Shake", "nameAr": "شوكولاتة ميلك شيك", "price": 1.3, "img": "chocolate-milkshake.jpg"}, {"name": "Vanilla Milk Shake", "nameAr": "فانيلا ميلك شيك", "price": 1.3, "img": "vanilla-milkshake.jpg"}, {"name": "Strawberry Milk Shake", "nameAr": "فراولة ميلك شيك", "price": 1.4, "img": "strawberry-milkshake.jpg"}, {"name": "Lotus Milk Shake", "nameAr": "لوتس ميلك شيك", "price": 1.4, "img": "lotus-milkshake.jpg"}]}, {"name": "Matcha Days", "nameAr": "ماتشا", "icon": "✿", "items": [{"name": "Matcha Latte", "nameAr": "ماتشا لاتيه", "price": 1.5, "img": "matcha-latte.jpg"}, {"name": "Iced Matcha Latte", "nameAr": "آيس ماتشا لاتيه", "price": 1.5, "img": "iced-matcha-latte.jpg"}, {"name": "Matcha Coconut Latte", "nameAr": "ماتشا جوز الهند", "price": 1.8, "img": "matcha-coconut.jpg"}, {"name": "Strawberry Matcha", "nameAr": "ماتشا فراولة", "price": 1.8, "img": "strawberry-matcha.jpg"}]}, {"name": "Slush (Smoothie)", "nameAr": "سلاش وسموذي", "icon": "☂", "items": [{"name": "Mango Slush", "nameAr": "سلاش مانجو", "price": 1.3, "img": "mango-slush.jpg"}, {"name": "Strawberry Slush", "nameAr": "سلاش فراولة", "price": 1.3, "img": "strawberry-slush.jpg"}, {"name": "Watermelon Slush", "nameAr": "سلاش بطيخ", "price": 1.0, "img": "watermelon-slush.jpg"}, {"name": "Blueberry Slush", "nameAr": "سلاش بلوبيري", "price": 1.3, "img": "blueberry-slush.jpg"}, {"name": "Passion Fruit Slush", "nameAr": "سلاش باشن فروت", "price": 1.3, "img": "passion-fruit-slush.jpg"}, {"name": "Peach Slush", "nameAr": "سلاش خوخ", "price": 1.3, "img": "peach-slush.jpg"}, {"name": "Mixed Berry Slush", "nameAr": "سلاش توت مشكل", "price": 1.3, "img": "mixed-berry-slush.jpg"}]}, {"name": "Mojito & Refreshers", "nameAr": "موهيتو ومنعشات", "icon": "☘", "items": [{"name": "Blue Mojito", "nameAr": "موهيتو أزرق", "price": 1.4, "img": "blue-mojito.jpg"}, {"name": "Passion Fruit Mojito", "nameAr": "موهيتو باشن فروت", "price": 1.4, "img": "passion-fruit-mojito.jpg"}, {"name": "Green Apple Mojito", "nameAr": "موهيتو تفاح أخضر", "price": 1.4, "img": "green-apple-mojito.jpg"}, {"name": "Strawberry Mojito", "nameAr": "موهيتو فراولة", "price": 1.4, "img": "strawberry-mojito.jpg"}, {"name": "Lemon Mint", "nameAr": "ليمون نعناع", "price": 1.2, "img": "lemon-mint.jpg"}, {"name": "Peach Ice Tea", "nameAr": "آيس تي خوخ", "price": 1.4, "img": "peach-ice-tea.jpg"}]}, {"name": "Fresh Juice", "nameAr": "عصائر طازجة", "icon": "☞", "items": [{"name": "Strawberry Juice", "nameAr": "عصير فراولة", "price": 1.2, "img": "strawberry-juice.jpg"}, {"name": "Mango Juice", "nameAr": "عصير مانجو", "price": 1.2, "img": "mango-juice.jpg"}, {"name": "Pineapple Juice", "nameAr": "عصير أناناس", "price": 1.2, "img": "pineapple-juice.jpg"}, {"name": "Orange Juice", "nameAr": "عصير برتقال", "price": 1.0, "img": "orange-juice.jpg"}]}, {"name": "Dessert", "nameAr": "حلويات", "icon": "♡", "items": [{"name": "Tiramisu Cup", "nameAr": "كوب تيراميسو", "price": 2.0, "img": "tiramisu.jpg"}, {"name": "San Sebastian", "nameAr": "سان سباستيان", "price": 2.0, "img": "san-sebastian.jpg"}, {"name": "Brownies", "nameAr": "براونيز", "price": 1.6, "img": "brownies.jpg"}, {"name": "Cookies", "nameAr": "كوكيز", "price": 0.8, "img": "cookies.jpg"}, {"name": "Chocolate Cake", "nameAr": "كيك شوكولاتة", "price": 1.5, "img": "chocolate-cake.jpg"}, {"name": "Cheesecake (Berry)", "nameAr": "تشيز كيك توت", "price": 1.6, "img": "cheesecake.jpg"}]}];
+const money = n => Number(n).toFixed(3) + " OMR";
+// flat list for lightbox navigation
+const flat = [];
+DATA.forEach(c => c.items.forEach(it => flat.push(it)));
+
+const catsEl = document.getElementById('cats');
+let total = 0;
+DATA.forEach(c => {
+  total += c.items.length;
+  const title = document.createElement('div');
+  title.className = 'cat-title';
+  title.innerHTML = c.icon + ' ' + c.nameAr + ' <span class="em">(' + c.name + ' · ' + c.items.length + ')</span>';
+  catsEl.appendChild(title);
+  const grid = document.createElement('div');
+  grid.className = 'grid';
+  c.items.forEach(it => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = '<div class="imgbox"><img src="'+it.img+'" alt="'+it.name+'" loading="lazy"></div>'+
+      '<div class="info"><h3>'+it.nameAr+'</h3><p>'+it.name+'</p><div class="price">'+money(it.price)+'</div></div>';
+    card.onclick = () => openLb(flat.indexOf(it));
+    grid.appendChild(card);
+  });
+  catsEl.appendChild(grid);
+});
+document.getElementById('count').textContent = total + ' منتج بالصور';
+
+const lb = document.getElementById('lb');
+let cur = 0;
+function openLb(i){cur=i;render();lb.classList.add('open')}
+function render(){
+  const it = flat[cur];
+  document.getElementById('lbImg').src = it.img;
+  document.getElementById('lbName').textContent = it.nameAr;
+  document.getElementById('lbNameAr').textContent = it.name;
+  document.getElementById('lbPrice').textContent = money(it.price);
+}
+function move(d){cur=(cur+d+flat.length)%flat.length;render()}
+document.getElementById('lbClose').onclick = ()=>lb.classList.remove('open');
+document.getElementById('lbPrev').onclick = ()=>move(1);
+document.getElementById('lbNext').onclick = ()=>move(-1);
+lb.onclick = e => { if(e.target===lb) lb.classList.remove('open'); };
+document.addEventListener('keydown', e=>{
+  if(!lb.classList.contains('open'))return;
+  if(e.key==='Escape')lb.classList.remove('open');
+  if(e.key==='ArrowRight')move(-1);
+  if(e.key==='ArrowLeft')move(1);
+});
+</script>
+</body>
+</html>
